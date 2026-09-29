@@ -1,26 +1,672 @@
 @import "tailwindcss";
 
+/* ==========================================================================
+   Studio Kunal — design tokens
+   Deep ink + charcoal for the "gallery at night", warm ivory + stone for the
+   "printed catalogue". Champagne and bronze are used sparingly as accents.
+   ========================================================================== */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --ink: #0d0c0b;
+  --char: #171513;
+  --char-2: #1f1c19;
+  --ivory: #f2ede4;
+  --ivory-2: #e8e1d5;
+  --stone: #a39a8c;
+  --stone-d: #6f675d;
+  --champ: #cdb894;
+  --bronze: #8e6a47;
+  --line-dark: rgb(242 237 228 / 0.14);
+  --line-light: rgb(13 12 11 / 0.14);
+
+  --gutter: clamp(16px, 4vw, 56px);
+  --header-h: 72px;
+  --ease-out: cubic-bezier(0.19, 1, 0.22, 1);
+  --ease-io: cubic-bezier(0.65, 0, 0.35, 1);
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-ink: var(--ink);
+  --color-char: var(--char);
+  --color-char-2: var(--char-2);
+  --color-ivory: var(--ivory);
+  --color-ivory-2: var(--ivory-2);
+  --color-stone: var(--stone);
+  --color-stone-d: var(--stone-d);
+  --color-champ: var(--champ);
+  --color-bronze: var(--bronze);
+  --font-serif: var(--font-display);
+  --font-sans: var(--font-text);
+  --font-script: var(--font-hand);
+  --breakpoint-xs: 30rem;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  background: var(--ink);
+  color: var(--ivory);
+  -webkit-text-size-adjust: 100%;
+  scroll-padding-top: 0;
+}
+
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis:not(.lenis-autoToggle).lenis-stopped {
+  overflow: clip;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-text), ui-sans-serif, system-ui, sans-serif;
+  background: var(--ink);
+  color: var(--ivory);
+  overflow-x: clip;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: var(--champ);
+  color: var(--ink);
+}
+
+:focus-visible {
+  outline: 1px solid var(--champ);
+  outline-offset: 4px;
+}
+
+/* Film grain — static, GPU-cheap, never intercepts input */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  pointer-events: none;
+  opacity: 0.07;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+@layer components {
+/* ==========================================================================
+   Layout primitives
+   ========================================================================== */
+.wrap {
+  width: 100%;
+  max-width: 1680px;
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+.section-pad {
+  padding-block: clamp(88px, 12vw, 200px);
+}
+
+.theme-light {
+  background: var(--ivory);
+  color: var(--ink);
+}
+.theme-dark {
+  background: var(--ink);
+  color: var(--ivory);
+}
+.theme-char {
+  background: var(--char);
+  color: var(--ivory);
+}
+
+.rule {
+  border-color: var(--line-dark);
+}
+.theme-light .rule {
+  border-color: var(--line-light);
+}
+
+/* ==========================================================================
+   Typography
+   ========================================================================== */
+.t-display {
+  font-family: var(--font-display), serif;
+  font-weight: 400;
+  font-size: clamp(2.6rem, 0.4rem + 10vw, 5.6rem);
+  line-height: 0.93;
+  letter-spacing: -0.022em;
+}
+@media (min-width: 1024px) {
+  .t-display {
+    font-size: clamp(4rem, 0.9rem + 6.4vw, 8.6rem);
+  }
+}
+.t-h2 {
+  font-family: var(--font-display), serif;
+  font-weight: 400;
+  font-size: clamp(2.5rem, 0.6rem + 8.2vw, 4.8rem);
+  line-height: 0.95;
+  letter-spacing: -0.02em;
+}
+@media (min-width: 1024px) {
+  .t-h2 {
+    font-size: clamp(3.5rem, 1rem + 5vw, 7rem);
+  }
+}
+.t-h3 {
+  font-family: var(--font-display), serif;
+  font-weight: 400;
+  font-size: clamp(1.7rem, 1.05rem + 2.1vw, 3.1rem);
+  line-height: 1.02;
+  letter-spacing: -0.012em;
+}
+.t-quote {
+  font-family: var(--font-display), serif;
+  font-size: clamp(1.45rem, 0.95rem + 1.6vw, 2.5rem);
+  line-height: 1.18;
+  letter-spacing: -0.008em;
+}
+.t-label {
+  font-family: var(--font-text), sans-serif;
+  font-size: 0.6875rem;
+  line-height: 1.4;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+.t-body {
+  font-size: clamp(0.975rem, 0.93rem + 0.2vw, 1.075rem);
+  line-height: 1.72;
+}
+.t-lead {
+  font-size: clamp(1.05rem, 0.95rem + 0.45vw, 1.3rem);
+  line-height: 1.6;
+}
+.t-script {
+  font-family: var(--font-hand), cursive;
+  font-weight: 400;
+  line-height: 1;
+}
+.serif-em {
+  font-style: italic;
+  color: var(--champ);
+}
+.theme-light .serif-em {
+  color: var(--bronze);
+}
+
+/* Outlined section numeral */
+.numeral {
+  font-family: var(--font-display), serif;
+  font-size: clamp(4.5rem, 2rem + 9vw, 12rem);
+  line-height: 0.8;
+  letter-spacing: -0.04em;
+  color: transparent;
+  -webkit-text-stroke: 1px currentColor;
+  opacity: 0.55;
+}
+
+.vertical-label {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+}
+
+/* ==========================================================================
+   Split lines (headings are pre-split on the server)
+   ========================================================================== */
+.ln {
+  display: block;
+  overflow: hidden;
+  padding-bottom: 0.1em;
+  margin-bottom: -0.1em;
+}
+.ln > span {
+  display: inline-block;
+  will-change: transform;
+}
+
+/* ==========================================================================
+   Buttons / links
+   ========================================================================== */
+.btn {
+  --btn-fg: currentColor;
+  position: relative;
+  isolation: isolate;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.9rem;
+  min-height: 54px;
+  padding: 0 1.65rem;
+  border: 1px solid currentColor;
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+  transition: color 0.6s var(--ease-out), border-color 0.6s var(--ease-out);
+}
+.btn::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: currentColor;
+  transform: scaleY(0);
+  transform-origin: bottom;
+  transition: transform 0.6s var(--ease-out);
+}
+.btn .arrow {
+  display: inline-block;
+  transition: transform 0.6s var(--ease-out);
+}
+@media (hover: hover) {
+  .btn:hover .arrow {
+    transform: translateX(5px);
+  }
+}
+.btn-ghost-dark:hover {
+  color: var(--ink);
+  border-color: var(--ivory);
+}
+.btn-ghost-dark:hover::before {
+  background: var(--ivory);
+  transform: scaleY(1);
+}
+.btn-ghost-light:hover {
+  color: var(--ivory);
+  border-color: var(--ink);
+}
+.btn-ghost-light:hover::before {
+  background: var(--ink);
+  transform: scaleY(1);
+}
+.btn-solid {
+  background: var(--ivory);
+  color: var(--ink);
+  border-color: var(--ivory);
+}
+.btn-solid::before {
+  background: var(--champ);
+}
+.btn-solid:hover::before {
+  transform: scaleY(1);
+}
+.btn-ink {
+  background: var(--ink);
+  color: var(--ivory);
+  border-color: var(--ink);
+}
+.btn-ink::before {
+  background: var(--bronze);
+}
+.btn-ink:hover::before {
+  transform: scaleY(1);
+}
+
+.link-line {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding-block: 0.35rem;
+}
+.link-line::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  background: currentColor;
+  transform-origin: right;
+  transition: transform 0.7s var(--ease-out);
+}
+@media (hover: hover) {
+  .link-line:hover::after {
+    transform: scaleX(0);
+  }
+}
+
+/* ==========================================================================
+   Frame marks — viewfinder corners used across the exhibition
+   ========================================================================== */
+.frame-marks {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.frame-marks::before,
+.frame-marks::after,
+.frame-marks > i::before,
+.frame-marks > i::after {
+  content: "";
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  border-color: currentColor;
+  opacity: 0.7;
+}
+.frame-marks::before {
+  top: 0;
+  left: 0;
+  border-top: 1px solid;
+  border-left: 1px solid;
+}
+.frame-marks::after {
+  top: 0;
+  right: 0;
+  border-top: 1px solid;
+  border-right: 1px solid;
+}
+.frame-marks > i::before {
+  bottom: 0;
+  left: 0;
+  border-bottom: 1px solid;
+  border-left: 1px solid;
+}
+.frame-marks > i::after {
+  bottom: 0;
+  right: 0;
+  border-bottom: 1px solid;
+  border-right: 1px solid;
+}
+
+}
+/* ==========================================================================
+   Hero intro — CSS only so it never waits for JavaScript
+   ========================================================================== */
+@keyframes hero-img {
+  from {
+    transform: scale(1.12);
+  }
+  to {
+    transform: scale(1.02);
+  }
+}
+@keyframes rise {
+  from {
+    transform: translateY(108%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes scroll-cue {
+  0% {
+    transform: scaleY(0);
+    transform-origin: top;
+  }
+  45% {
+    transform: scaleY(1);
+    transform-origin: top;
+  }
+  55% {
+    transform: scaleY(1);
+    transform-origin: bottom;
+  }
+  100% {
+    transform: scaleY(0);
+    transform-origin: bottom;
+  }
+}
+@keyframes draw-x {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+.hero-img {
+  transform: scale(1.02);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .hero-img {
+    animation: hero-img 2.8s var(--ease-out) both;
+  }
+  .hero-lines .ln > span {
+    animation: rise 1.35s var(--ease-out) both;
+    animation-delay: calc(0.25s + var(--i, 0) * 0.11s);
+  }
+  .hero-fade {
+    animation: fade-up 1.2s var(--ease-out) both;
+    animation-delay: var(--d, 0.9s);
+  }
+  .hero-rule {
+    transform-origin: left;
+    animation: draw-x 1.6s var(--ease-io) both;
+    animation-delay: var(--d, 0.8s);
+  }
+  .header-intro {
+    animation: fade-in 1.2s var(--ease-out) 0.55s both;
+  }
+  .scroll-cue-line {
+    animation: scroll-cue 2.4s var(--ease-io) 2s infinite;
+  }
+}
+
+/* ==========================================================================
+   Scroll reveals — states only apply once JS marks <html class="motion">,
+   so content is always visible without JavaScript.
+   ========================================================================== */
+@media (prefers-reduced-motion: no-preference) {
+  html.motion [data-reveal="lines"] .ln > span {
+    transform: translateY(108%);
+    transition: transform 1.3s var(--ease-out);
+    transition-delay: calc(var(--i, 0) * 0.09s);
+  }
+  html.motion [data-reveal="lines"].is-in .ln > span {
+    transform: none;
+  }
+
+  html.motion [data-reveal="fade"] {
+    opacity: 0;
+    transform: translateY(26px);
+    transition:
+      opacity 1.2s var(--ease-out),
+      transform 1.2s var(--ease-out);
+    transition-delay: var(--d, 0s);
+  }
+  html.motion [data-reveal="fade"].is-in {
+    opacity: 1;
+    transform: none;
+  }
+
+  html.motion [data-reveal="mask"] {
+    clip-path: inset(100% 0 0 0);
+    transition: clip-path 1.5s var(--ease-out);
+    transition-delay: var(--d, 0s);
+  }
+  html.motion [data-reveal="mask"] img {
+    transform: scale(1.22);
+    transition: transform 2s var(--ease-out);
+    transition-delay: var(--d, 0s);
+  }
+  html.motion [data-reveal="mask"].is-in {
+    clip-path: inset(0 0 0 0);
+  }
+  html.motion [data-reveal="mask"].is-in img {
+    transform: scale(1);
+  }
+
+  html.motion [data-reveal="draw"] {
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 1.6s var(--ease-io);
+    transition-delay: var(--d, 0s);
+  }
+  html.motion [data-reveal="draw-y"] {
+    transform: scaleY(0);
+    transform-origin: top;
+    transition: transform 1.6s var(--ease-io);
+    transition-delay: var(--d, 0s);
+  }
+  html.motion [data-reveal="draw"].is-in,
+  html.motion [data-reveal="draw-y"].is-in {
+    transform: none;
+  }
+}
+
+@layer components {
+/* ==========================================================================
+   Scroll-snap rails (mobile galleries, testimonials, film strip)
+   ========================================================================== */
+.rail {
+  display: flex;
+  scroll-padding-inline: var(--gutter);
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+.rail::-webkit-scrollbar {
+  display: none;
+}
+.rail > * {
+  scroll-snap-align: start;
+  flex: 0 0 auto;
+}
+.rail-center > * {
+  scroll-snap-align: center;
+}
+
+/* Film sprocket edge */
+.sprockets {
+  height: 7px;
+  background: repeating-linear-gradient(90deg, rgb(242 237 228 / 0.16) 0 12px, transparent 12px 26px);
+}
+
+}
+/* ==========================================================================
+   Custom cursor (fine pointers only; toggled by JS)
+   ========================================================================== */
+html.has-cursor,
+html.has-cursor a,
+html.has-cursor button,
+html.has-cursor [data-cursor] {
+  cursor: none;
+}
+html.has-cursor input,
+html.has-cursor textarea,
+html.has-cursor select {
+  cursor: auto;
+}
+
+/* Header adapts to the section beneath it */
+html[data-scrolled="true"] .site-header-bg {
+  background: rgb(13 12 11 / 0.72);
+  border-color: var(--line-dark);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+html[data-header="light"] .site-header {
+  color: var(--ink);
+}
+html[data-header="light"] .site-header-accent {
+  color: var(--bronze);
+}
+html[data-header="light"][data-scrolled="true"] .site-header-bg {
+  background: rgb(242 237 228 / 0.82);
+  border-color: var(--line-light);
+}
+html[data-header="light"] .site-header-cta:hover {
+  color: var(--ivory);
+  border-color: var(--ink);
+}
+html[data-header="light"] .site-header-cta:hover::before {
+  background: var(--ink);
+}
+
+@layer components {
+/* Accordion height animation without JS measuring */
+.acc-panel {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.7s var(--ease-out);
+}
+.acc-panel[data-open="true"] {
+  grid-template-rows: 1fr;
+}
+.acc-panel > div {
+  overflow: hidden;
+  min-height: 0;
+}
+
+/* Form fields */
+.field {
+  width: 100%;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid var(--line-dark);
+  padding: 0.9rem 0 0.85rem;
+  font-size: 1rem;
+  color: var(--ivory);
+  border-radius: 0;
+  transition: border-color 0.4s var(--ease-out);
+  appearance: none;
+}
+.field::placeholder {
+  color: rgb(242 237 228 / 0.32);
+}
+.field:focus {
+  outline: none;
+  border-bottom-color: var(--champ);
+}
+.field:focus-visible {
+  outline: none;
+}
+.field[aria-invalid="true"] {
+  border-bottom-color: #c98a6b;
+}
+.field::-webkit-calendar-picker-indicator {
+  filter: invert(0.9);
+  opacity: 0.6;
+}
+
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+.sr-only-focusable:not(:focus) {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+html[data-header="light"] .site-header[data-menu="open"] {
+  color: var(--ivory);
+}
+.site-header[data-menu="open"] .site-header-bg {
+  background: transparent !important;
+  border-color: transparent !important;
+  backdrop-filter: none !important;
 }
