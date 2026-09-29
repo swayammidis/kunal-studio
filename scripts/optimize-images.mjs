@@ -1,5 +1,5 @@
 // Resizes raw downloads in /assets-src into web-ready masters in /public/images
-// and writes content/images.json (dimensions + tiny blur placeholders).
+// and writes data/images.json (dimensions + tiny blur placeholders).
 // next/image then generates responsive AVIF/WebP variants at request time.
 import sharp from "sharp";
 import fs from "node:fs";
@@ -33,5 +33,5 @@ result.films = {};
 for (const f of fs.readdirSync(path.join(SRC, "films"))) {
   result.films[f.replace(/\.jpg$/, "")] = await processFile("films/" + f, 1600);
 }
-fs.writeFileSync("content/images.json", JSON.stringify(result, null, 1));
+fs.writeFileSync("data/images.json", JSON.stringify(result, null, 1));
 console.log("done");

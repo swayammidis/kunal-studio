@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { experience } from "@/content/site";
+import { experience } from "@/data";
 import { pad } from "@/lib/utils";
 
 /**

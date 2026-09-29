@@ -2,12 +2,12 @@
 
 import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { brand, menuImage, navLinks } from "@/content/site";
+import { brand, menuImage, navLinks } from "@/data";
 import { lockScroll, scrollToId } from "@/lib/scroll";
 import { pad } from "@/lib/utils";
 import { InstagramIcon, WhatsAppIcon, YouTubeIcon } from "@/components/ui/Icons";
 
-const desktopLinks = navLinks.filter((l) => l.id !== "contact");
+const desktopLinks = navLinks.filter((l) => l.id !== "contact" && l.id !== "destination");
 
 export function SiteHeader() {
   const [open, setOpen] = useState(false);
@@ -115,7 +115,7 @@ export function SiteHeader() {
           </nav>
 
           <div className="relative z-[2] flex items-center gap-3">
-            <a href="#contact" className="btn btn-ghost-dark site-header-cta hidden min-h-[44px] px-5 sm:inline-flex" data-track="hero_cta" data-track-label="nav_connect" data-cursor="Connect →" data-magnetic>
+            <a href="#contact" className="btn btn-ghost-dark site-header-cta hidden min-h-[44px] px-5 sm:inline-flex" data-track="hero_cta" data-track-label="nav_connect" data-cursor="Let’s connect →" data-magnetic>
               <span>Let&apos;s Connect</span>
               <span className="arrow" aria-hidden>
                 →

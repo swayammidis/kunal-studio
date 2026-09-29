@@ -1,11 +1,11 @@
-import { about } from "@/content/site";
+import { about } from "@/data";
 import { Photo } from "@/components/ui/Photo";
 import { SectionMark } from "@/components/ui/SectionMark";
 import { SplitLines } from "@/components/ui/SplitLines";
 import { CtaLink } from "@/components/ui/CtaLink";
 import { pad } from "@/lib/utils";
 
-export function About() {
+export function Approach() {
   const { collage } = about;
   return (
     <section id="about" aria-labelledby="about-title" className="theme-light relative overflow-hidden section-pad">
@@ -31,7 +31,7 @@ export function About() {
               ))}
             </div>
             <div className="mt-10" data-reveal="fade">
-              <CtaLink href="#stories" variant="ghost-light" cursor="View work">
+              <CtaLink href="#stories" variant="ghost-light" cursor="View work →">
                 Explore Our Stories
               </CtaLink>
             </div>
@@ -57,7 +57,7 @@ export function About() {
               </div>
 
               {/* Black & white arch, with offset outline */}
-              <div className="absolute left-0 top-[16%] w-[42%] lg:left-[2%] lg:w-[36%]" data-parallax="0.22">
+              <div className="absolute left-0 top-[16%] w-[42%] -rotate-2 lg:left-[2%] lg:w-[36%]" data-parallax="0.22">
                 <div className="absolute -inset-3 border border-[var(--line-light)] sm:-inset-4" data-reveal="fade" aria-hidden />
                 <div data-reveal="mask" style={{ ["--d" as string]: "0.15s" }}>
                   <Photo
@@ -68,10 +68,11 @@ export function About() {
                     imgClassName="grayscale"
                   />
                 </div>
+                <p className="t-label mt-3 text-ink/50">Pl. II — Documentary</p>
               </div>
 
               {/* Ceremony frame overlapping the main image */}
-              <div className="absolute bottom-0 left-[20%] w-[40%] lg:left-[24%] lg:w-[34%]" data-parallax="0.16">
+              <div className="absolute bottom-0 left-[20%] w-[40%] rotate-[1.5deg] lg:left-[24%] lg:w-[34%]" data-parallax="0.16">
                 <div data-reveal="mask" style={{ ["--d" as string]: "0.3s" }}>
                   <Photo
                     photo={collage.ceremony}

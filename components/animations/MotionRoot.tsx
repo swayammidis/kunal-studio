@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { loadGsap, prefersReducedMotion } from "@/lib/animations/gsap";
 import { scrollToId, setLenis } from "@/lib/scroll";
-import { track, type TrackEvent } from "@/lib/analytics";
+import { captureAttribution, track, type TrackEvent } from "@/lib/analytics";
 
 /**
  * Global motion + interaction layer. Renders nothing.
@@ -17,6 +17,7 @@ import { track, type TrackEvent } from "@/lib/analytics";
  */
 export function MotionRoot() {
   useEffect(() => {
+    captureAttribution();
     const root = document.documentElement;
     const reduce = prefersReducedMotion();
     const cleanups: (() => void)[] = [];
@@ -135,6 +136,22 @@ export function MotionRoot() {
                   scrollTrigger: { trigger: el.parentElement ?? el, start: "top bottom", end: "bottom top", scrub: true },
                 },
               );
+            });
+
+            // Curtains: light sections open from a framed panel to full width as
+            // they enter, and close again as they leave — cuts, not hard edges.
+            const inset = desktop ? 5 : tablet ? 3 : 2.5;
+            const framed = `inset(0% ${inset}% 0% ${inset}%)`;
+            gsap.utils.toArray<HTMLElement>("[data-curtain]").forEach((el) => {
+              const vh = window.innerHeight;
+              const total = el.offsetHeight + vh;
+              const enter = vh * 0.75;
+              const exit = vh * 0.6;
+              gsap
+                .timeline({ scrollTrigger: { trigger: el, start: "top bottom", end: "bottom top", scrub: true } })
+                .fromTo(el, { clipPath: framed }, { clipPath: "inset(0% 0% 0% 0%)", duration: enter, ease: "power1.out" })
+                .to(el, { clipPath: "inset(0% 0% 0% 0%)", duration: Math.max(1, total - enter - exit), ease: "none" })
+                .to(el, { clipPath: framed, duration: exit, ease: "power1.in" });
             });
           },
         );

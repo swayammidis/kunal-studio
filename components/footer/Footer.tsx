@@ -1,4 +1,4 @@
-import { brand, navLinks } from "@/content/site";
+import { brand, navLinks } from "@/data";
 import { InstagramIcon, WhatsAppIcon, YouTubeIcon } from "@/components/ui/Icons";
 
 const social = [

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { brand } from "@/content/site";
+import { brand } from "@/data";
 import { WhatsAppIcon } from "@/components/ui/Icons";
 
 /**

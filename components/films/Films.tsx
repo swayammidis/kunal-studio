@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { brand, films } from "@/content/site";
+import { brand, films } from "@/data";
 import { Photo } from "@/components/ui/Photo";
 import { PlayIcon, YouTubeIcon } from "@/components/ui/Icons";
 import { SectionMark } from "@/components/ui/SectionMark";
@@ -74,7 +74,7 @@ export function Films() {
             onClick={() => play(featured)}
             className="group relative block aspect-[4/3] w-full overflow-hidden bg-ink sm:aspect-video"
             aria-label={`Play film ${pad(f.number)} of ${total}`}
-            data-cursor="Play film"
+            data-cursor="Play film →"
           >
             {films.map((film, i) => (
               <div
@@ -129,7 +129,7 @@ export function Films() {
                   onFocus={() => setFeatured(i)}
                   className="group block w-full text-left"
                   aria-label={`Play film ${pad(film.number)} of ${total}`}
-                  data-cursor="Play film"
+                  data-cursor="Play film →"
                 >
                   <span className={`relative block aspect-video overflow-hidden transition-opacity duration-500 ${i === featured ? "opacity-100" : "opacity-55 group-hover:opacity-100"}`}>
                     <Photo photo={film.poster} alt="" sizes="(min-width:1024px) 22vw, 62vw" quality={60} className="h-full w-full" imgClassName="transition-transform duration-1000 group-hover:scale-105" />

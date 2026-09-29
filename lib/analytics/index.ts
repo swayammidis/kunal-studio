@@ -6,6 +6,8 @@
  * via NEXT_PUBLIC_GTM_ID (see app/layout.tsx) and map these event names to
  * conversions in the tag manager.
  */
+import { getAttribution } from "./attribution";
+
 export type TrackEvent =
   | "hero_cta"
   | "portfolio_open"
@@ -24,11 +26,14 @@ type DataLayerWindow = Window & {
   gtag?: (...args: unknown[]) => void;
 };
 
+export { captureAttribution, getAttribution } from "./attribution";
+
 export function track(event: TrackEvent, params: Record<string, unknown> = {}) {
   if (typeof window === "undefined") return;
   const w = window as DataLayerWindow;
+  const payload = { ...getAttribution(), ...params };
   w.dataLayer = w.dataLayer || [];
-  w.dataLayer.push({ event, ...params });
-  if (typeof w.gtag === "function") w.gtag("event", event, params);
+  w.dataLayer.push({ event, ...payload });
+  if (typeof w.gtag === "function") w.gtag("event", event, payload);
   if (process.env.NODE_ENV === "development") console.debug("[track]", event, params);
 }

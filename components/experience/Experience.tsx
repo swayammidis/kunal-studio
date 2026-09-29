@@ -1,4 +1,4 @@
-import { experience } from "@/content/site";
+import { experience } from "@/data";
 import { Photo } from "@/components/ui/Photo";
 import { SectionMark } from "@/components/ui/SectionMark";
 import { SplitLines } from "@/components/ui/SplitLines";

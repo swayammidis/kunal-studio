@@ -1,9 +1,9 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import type { Project } from "@/content/site";
+import type { Project } from "@/data";
 import { Photo } from "@/components/ui/Photo";
-import { openGallery } from "@/lib/gallery";
+import { openGallery } from "@/components/gallery/events";
 import { loadGsap, prefersReducedMotion } from "@/lib/animations/gsap";
 import { getLenis } from "@/lib/scroll";
 import { cx, pad } from "@/lib/utils";
@@ -17,6 +17,8 @@ export function StoriesExhibit({ projects }: Props) {
   const total = projects.length;
   const [active, setActive] = useState(0);
   const pinRef = useRef<HTMLDivElement>(null);
+  const ghostRef = useRef<HTMLDivElement>(null);
+  const [hover, setHover] = useState(false);
   const triggerRef = useRef<{ start: number; end: number } | null>(null);
 
   // ---- Desktop: pin the exhibit and map scroll progress to the active story.
@@ -35,7 +37,12 @@ export function StoriesExhibit({ projects }: Props) {
           pin: true,
           anticipatePin: 1,
           invalidateOnRefresh: true,
-          onUpdate: (self) => setActive(Math.round(self.progress * (total - 1))),
+          onUpdate: (self) => {
+            setActive(Math.round(self.progress * (total - 1)));
+            // Horizontal drift of the ghost title track, continuous with scroll.
+            const g = ghostRef.current;
+            if (g) g.style.transform = `translate3d(${-self.progress * Math.max(0, g.scrollWidth - window.innerWidth)}px,0,0)`;
+          },
           onRefresh: (self) => (triggerRef.current = { start: self.start, end: self.end }),
         });
         triggerRef.current = { start: st.start, end: st.end };
@@ -83,7 +90,24 @@ export function StoriesExhibit({ projects }: Props) {
         ref={pinRef}
         className="relative hidden h-[100svh] lg:block"
       >
-        <div className="wrap grid h-full grid-cols-12 gap-x-8 pb-[5vh] pt-[calc(var(--header-h)+4vh)]">
+        {/* Ghost titles — the whole exhibition drifting sideways behind the frames */}
+        <div className="pointer-events-none absolute inset-x-0 bottom-[6vh] overflow-hidden" aria-hidden>
+          <div ref={ghostRef} className="flex w-max gap-[6vw] whitespace-nowrap pl-[var(--gutter)] will-change-transform">
+            {projects.map((p, i) => (
+              <span
+                key={p.slug}
+                className={cx(
+                  "font-serif text-[clamp(6rem,13vw,15rem)] leading-none tracking-[-0.03em] text-transparent transition-opacity duration-700 [-webkit-text-stroke:1px_rgb(242_237_228/0.14)]",
+                  i === active ? "opacity-100" : "opacity-50",
+                )}
+              >
+                {p.title}
+              </span>
+            ))}
+          </div>
+        </div>
+
+        <div className="wrap relative grid h-full grid-cols-12 gap-x-8 pb-[5vh] pt-[calc(var(--header-h)+4vh)]">
           {/* Left: counter, title, index */}
           <div className="col-span-4 flex min-h-0 flex-col justify-between">
             <div>
@@ -102,7 +126,7 @@ export function StoriesExhibit({ projects }: Props) {
                 <span className="t-label mb-3 text-ivory/50">/ {pad(total)}</span>
               </div>
 
-              <div className="relative mt-8 grid" aria-live="polite">
+              <div className={cx("relative mt-8 grid transition-transform duration-700 ease-[cubic-bezier(0.19,1,0.22,1)]", hover && "translate-x-3")} aria-live="polite">
                 {projects.map((p, i) => (
                   <div
                     key={p.slug}
@@ -169,6 +193,8 @@ export function StoriesExhibit({ projects }: Props) {
             <button
               type="button"
               onClick={() => openGallery(current.slug)}
+              onMouseEnter={() => setHover(true)}
+              onMouseLeave={() => setHover(false)}
               className="group relative aspect-[4/5] h-full max-h-[78svh] max-w-full overflow-hidden"
               aria-label={`Open the ${current.title} gallery`}
               data-cursor="View story →"

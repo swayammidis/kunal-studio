@@ -81,7 +81,7 @@ body::after {
   inset: 0;
   z-index: 90;
   pointer-events: none;
-  opacity: 0.07;
+  opacity: 0.05;
   mix-blend-mode: overlay;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
@@ -398,6 +398,15 @@ body::after {
     transform: none;
   }
 }
+/* Transform-only entrance: painted immediately, so it never delays LCP. */
+@keyframes shift-up {
+  from {
+    transform: translateY(22px);
+  }
+  to {
+    transform: none;
+  }
+}
 @keyframes fade-in {
   from {
     opacity: 0;
@@ -439,23 +448,27 @@ body::after {
 
 @media (prefers-reduced-motion: no-preference) {
   .hero-img {
-    animation: hero-img 2.8s var(--ease-out) both;
+    animation: hero-img 2.8s var(--ease-out) backwards;
   }
   .hero-lines .ln > span {
-    animation: rise 1.35s var(--ease-out) both;
+    animation: rise 1.35s var(--ease-out) backwards;
     animation-delay: calc(0.25s + var(--i, 0) * 0.11s);
   }
   .hero-fade {
-    animation: fade-up 1.2s var(--ease-out) both;
+    animation: fade-up 1.2s var(--ease-out) backwards;
     animation-delay: var(--d, 0.9s);
+  }
+  .hero-shift {
+    animation: shift-up 1.6s var(--ease-out) backwards;
+    animation-delay: var(--d, 0.3s);
   }
   .hero-rule {
     transform-origin: left;
-    animation: draw-x 1.6s var(--ease-io) both;
+    animation: draw-x 1.6s var(--ease-io) backwards;
     animation-delay: var(--d, 0.8s);
   }
   .header-intro {
-    animation: fade-in 1.2s var(--ease-out) 0.55s both;
+    animation: fade-in 1.2s var(--ease-out) 0.55s backwards;
   }
   .scroll-cue-line {
     animation: scroll-cue 2.4s var(--ease-io) 2s infinite;

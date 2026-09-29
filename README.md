@@ -34,44 +34,57 @@ Events are pushed to `window.dataLayer` (and `gtag` if present) from [lib/analyt
 | `contact_form_submit` | Inquiry delivered successfully — **use this as the primary Google Ads conversion** |
 | `contact_form_error` | Delivery failed and the email/WhatsApp fallback was shown |
 
+### Campaign attribution
+
+[lib/analytics/attribution.ts](lib/analytics/attribution.ts) reads `utm_source`, `utm_medium`, `utm_campaign`, `utm_term`, `utm_content`, `gclid`, `gbraid` and `wbraid` on landing. It keeps them for the visit (sessionStorage) and as first touch (localStorage, 90 days). They are added to every tracked event and sent with each inquiry as `attribution`, so leads can be matched to campaigns, including offline conversion import by `gclid`. In-page navigation only changes the `#hash`, so the landing query string stays in the address bar.
+
 Any element can be tracked declaratively with `data-track="<event>"`.
 
 ## Content
 
-All copy lives in [content/site.ts](content/site.ts) and was taken from the current studiokunalphotography.com pages: home, portfolio, investment, testimonials and get-in-touch. Do not add awards, statistics, venues, prices, packages or reviews that the studio has not published.
+Content lives in [data/](data/), one file per area (`brand`, `approach`, `story`, `portfolio`, `films`, `investment`, `testimonials`, `faq`), re-exported from `@/data`. All copy was taken from the current studiokunalphotography.com pages: home, portfolio, investment, testimonials and get-in-touch. Do not add awards, statistics, venues, prices, packages or reviews that the studio has not published.
 
 The films are the nine YouTube videos from the current Cinematic Films page. Their posters are YouTube thumbnails, and the players load only when someone presses play.
 
 ## Images
 
-Web-ready masters live in `public/images`. `next/image` serves responsive AVIF/WebP variants from them. [content/images.json](content/images.json) holds each image's dimensions and a blur placeholder.
+Web-ready masters live in `public/images`. `next/image` serves responsive AVIF/WebP variants from them. [data/images.json](data/images.json) holds each image's dimensions and a blur placeholder.
 
 To add or replace photos:
 
 1. Put the originals in `assets-src/` (git-ignored) and list them in `assets-src/manifest.json`.
-2. Run `node scripts/optimize-images.mjs` to regenerate `public/images` and `content/images.json`.
+2. Run `node scripts/optimize-images.mjs` to regenerate `public/images` and `data/images.json`.
+
+## The page as a film
+
+Opening (hero closes into a framed print) → 01 Our Approach → interlude "More than photographs. A feeling." → 02 The Experience → A wedding day in seven chapters → 03 Our Stories → film-strip reel → 04 Cinematic Films → 05 Destination → 06 Investment → 07 Testimonials → 08 FAQ → 09 Get In Touch.
+
+Transitions are part of the sections. Light sections carry `data-curtain`: they open from a framed panel as they enter and close as they leave.
 
 ## Architecture
 
 ```
 app/                 layout (fonts, SEO, JSON-LD), page, globals.css, api/inquiry, robots, sitemap
-content/             site.ts (all copy + data), images.json (generated)
+data/                all content + images.json (generated)
 components/
-  navigation/        SiteHeader (fixed header + full-screen mobile menu), StickyCta (mobile)
-  hero/              Hero — art-directed <picture>, CSS-only intro animation
-  about/             01 Our Approach — collage + principles
+  navigation/        SiteHeader (adaptive fixed header + full-screen menu), StickyCta (mobile)
+  hero/              Hero (art-directed <picture>, CSS intro) + HeroTransition (scroll: frame + ivory)
+  approach/          01 Our Approach — collage + principles
+  statement/         "More than photographs" interlude (sticky, scroll-scrubbed)
   experience/        02 The Experience — sticky storytelling stage
-  destinations/      North America → India → Destination (pinned horizontal on desktop, swipe on touch)
-  portfolio/         03 Our Stories — pinned exhibit, mobile rail, lazy fullscreen Lightbox
-  films/             04 Cinematic Films — featured poster, film strip, video modal
-  investment/        05 Investment
-  testimonials/      06 Testimonials — snap rail with expandable stories
-  faq/               07 FAQ — accessible accordion
-  contact/           08 Get In Touch — form + direct channels
+  wedding-story/     Seven sticky full-screen chapters that stack like cuts
+  portfolio/         03 Our Stories — pinned exhibit (+ ghost-title drift), mobile rail
+  gallery/           Fullscreen Lightbox (lazy), host + open-gallery event
+  films/             FilmBridge reel, 04 Cinematic Films, video modal
+  destination/       05 North America → India → Destination (pinned horizontal / swipe), route + plane
+  investment/        06 Investment — pinned photograph with frame swap
+  testimonials/      07 — snap rail with expandable stories
+  faq/               08 — accessible accordion
+  contact/           09 — form, attribution, "Thank you" state, direct channels
   footer/
-  animations/        MotionRoot (reveals, Lenis, parallax, anchors, tracking), Cursor
+  animations/        MotionRoot (reveals, Lenis, parallax, curtains, anchors, tracking), Cursor
   ui/                SplitLines, SectionMark, Photo, CtaLink, Icons
-lib/                 analytics, gallery event bus, scroll helpers, lazy GSAP loader
+lib/                 analytics (events + attribution), scroll helpers, lazy GSAP loader
 ```
 
 - Sections are Server Components. Client components are limited to interactive islands: header, galleries, sliders, films, FAQ, form, cursor and the motion layer.

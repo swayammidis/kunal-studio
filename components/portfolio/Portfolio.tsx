@@ -1,8 +1,9 @@
-import { projects } from "@/content/site";
+import { projects } from "@/data";
 import { SectionMark } from "@/components/ui/SectionMark";
 import { SplitLines } from "@/components/ui/SplitLines";
 import { CtaLink } from "@/components/ui/CtaLink";
 import { StoriesExhibit } from "./StoriesExhibit";
+import { FilmBridge } from "@/components/films/FilmBridge";
 
 export function Portfolio() {
   return (
@@ -38,6 +39,7 @@ export function Portfolio() {
           Check Availability
         </CtaLink>
       </div>
+      <FilmBridge />
     </section>
   );
 }

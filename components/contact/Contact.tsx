@@ -1,4 +1,4 @@
-import { brand, contact } from "@/content/site";
+import { brand, contact } from "@/data";
 import { Photo } from "@/components/ui/Photo";
 import { SectionMark } from "@/components/ui/SectionMark";
 import { SplitLines } from "@/components/ui/SplitLines";
@@ -33,7 +33,7 @@ export function Contact() {
         {/* Words + form */}
         <div className="min-w-0 lg:col-span-7">
           <div className="px-[var(--gutter)] py-[clamp(64px,10vw,160px)] lg:px-[clamp(40px,6vw,120px)]">
-            <SectionMark number="08" label="Get In Touch" />
+            <SectionMark number="09" label="Get In Touch" />
             <SplitLines
               id="contact-title"
               className="t-h2 mt-8"

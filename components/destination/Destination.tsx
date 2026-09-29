@@ -1,17 +1,20 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { destinations } from "@/content/site";
+import { destinations } from "@/data";
 import { Photo } from "@/components/ui/Photo";
 import { CtaLink } from "@/components/ui/CtaLink";
 import { loadGsap, prefersReducedMotion } from "@/lib/animations/gsap";
 import { pad } from "@/lib/utils";
+import { SectionMark } from "@/components/ui/SectionMark";
+
+const ROUTE = "M20 90 C 150 10, 250 10, 300 60 S 470 110, 580 30";
 
 function Route({ className }: { className?: string }) {
   return (
     <svg viewBox="0 0 600 120" className={className} fill="none" aria-hidden>
-      <path d="M20 90 C 150 10, 250 10, 300 60 S 470 110, 580 30" stroke="currentColor" strokeOpacity="0.18" strokeDasharray="2 6" />
-      <path data-route d="M20 90 C 150 10, 250 10, 300 60 S 470 110, 580 30" stroke="var(--champ)" strokeWidth="1" pathLength={1} strokeDasharray="1" strokeDashoffset="0" />
+      <path data-route-geo d={ROUTE} stroke="currentColor" strokeOpacity="0.18" strokeDasharray="2 6" />
+      <path data-route d={ROUTE} stroke="var(--champ)" strokeWidth="1" pathLength={1} strokeDasharray="1" strokeDashoffset="0" />
       {[
         [20, 90, "N.A."],
         [300, 60, "IN"],
@@ -24,11 +27,15 @@ function Route({ className }: { className?: string }) {
           </text>
         </g>
       ))}
+      {/* The plane travels the route with scroll (static at India without motion). */}
+      <g data-plane transform="translate(300 60) rotate(12)">
+        <path d="M-8 -5.5 L10 0 L-8 5.5 L-4 0 Z" fill="var(--champ)" />
+      </g>
     </svg>
   );
 }
 
-export function Destinations() {
+export function Destination() {
   const section = useRef<HTMLElement>(null);
   const track = useRef<HTMLDivElement>(null);
   const progress = useRef<HTMLSpanElement>(null);
@@ -64,14 +71,15 @@ export function Destinations() {
             scrollTrigger: { trigger: img.parentElement, containerAnimation: tween, start: "left right", end: "right left", scrub: true },
           });
         });
-        const route = section.current!.querySelector<SVGPathElement>("[data-route]");
-        if (route) {
-          gsap.fromTo(route, { strokeDashoffset: 1 }, {
-            strokeDashoffset: 0,
-            ease: "none",
-            scrollTrigger: { trigger: section.current, start: "top 60%", end: () => `+=${distance() * 0.8}`, scrub: true },
-          });
-        }
+        flyRoutes(gsap, section.current!.querySelector("[data-route-desktop]"), {
+          trigger: section.current,
+          start: "top 60%",
+          end: () => `+=${distance() * 0.8}`,
+        });
+      });
+      mm.add("(max-width: 1023px)", () => {
+        const svg = section.current!.querySelector<HTMLElement>("[data-route-mobile]");
+        flyRoutes(gsap, svg, { trigger: svg, start: "top 85%", end: "top 25%" });
       });
       revert = () => mm.revert();
     });
@@ -90,17 +98,19 @@ export function Destinations() {
   };
 
   return (
-    <section ref={section} id="destinations" aria-label="Destination weddings — North America and India" className="theme-dark relative overflow-hidden lg:h-[100svh]">
+    <section ref={section} id="destination" aria-label="Destination weddings — North America and India" className="theme-dark relative overflow-hidden lg:h-[100svh]">
       {/* Mobile / tablet intro */}
       <div className="wrap pb-10 pt-[clamp(72px,12vw,120px)] lg:hidden">
-        <p className="t-label text-champ" data-reveal="fade">North America · India · Destination Weddings</p>
+        <SectionMark number="05" label="Destination Weddings" />
         <h2 className="t-h2 mt-6" data-reveal="fade">
           Based across <em className="serif-em">North America &amp; India.</em>
         </h2>
         <p className="t-body mt-6 max-w-[30rem] text-ivory/70" data-reveal="fade">
           Studio Kunal Photography operates across North America and India, and we are always excited to travel for destination weddings and special events.
         </p>
-        <Route className="mt-10 w-full max-w-[520px] text-ivory" />
+        <div data-route-mobile>
+          <Route className="mt-10 w-full max-w-[520px] text-ivory" />
+        </div>
       </div>
 
       <div
@@ -113,7 +123,7 @@ export function Destinations() {
       >
         {/* Desktop intro panel */}
         <div className="hidden h-full w-[52vw] shrink-0 flex-col justify-center pl-[var(--gutter)] pr-[6vw] lg:flex">
-          <p className="t-label text-champ">North America · India · Destination Weddings</p>
+          <SectionMark number="05" label="Destination Weddings" />
           <h2 className="t-h2 mt-8">
             Based across
             <br />
@@ -122,7 +132,9 @@ export function Destinations() {
           <p className="t-body mt-8 max-w-[32rem] text-ivory/70">
             Studio Kunal Photography operates across North America and India, and we are always excited to travel for destination weddings and special events.
           </p>
-          <Route className="mt-14 w-full max-w-[560px] text-ivory" />
+          <div data-route-desktop>
+            <Route className="mt-14 w-full max-w-[560px] text-ivory" />
+          </div>
         </div>
 
         {destinations.map((d, i) => (
@@ -159,7 +171,7 @@ export function Destinations() {
             A global perspective, preserving the <em className="serif-em">authenticity</em> of every moment.
           </p>
           <div className="mt-10">
-            <CtaLink href="#stories" variant="ghost-dark" cursor="View work">
+            <CtaLink href="#stories" variant="ghost-dark" cursor="View work →">
               Explore Our Stories
             </CtaLink>
           </div>
@@ -176,5 +188,35 @@ export function Destinations() {
         </div>
       </div>
     </section>
+  );
+}
+
+type Gsap = typeof import("gsap").gsap;
+
+/** Draw the route and fly the plane along it, scrubbed by the given trigger. */
+function flyRoutes(gsap: Gsap, scope: Element | null, st: Record<string, unknown>) {
+  if (!scope) return;
+  const line = scope.querySelector<SVGPathElement>("[data-route]");
+  const geo = scope.querySelector<SVGPathElement>("[data-route-geo]");
+  const plane = scope.querySelector<SVGGElement>("[data-plane]");
+  if (!line || !geo || !plane) return;
+  const length = geo.getTotalLength();
+  const state = { p: 0 };
+  gsap.fromTo(
+    state,
+    { p: 0 },
+    {
+      p: 1,
+      ease: "none",
+      scrollTrigger: { ...st, scrub: true },
+      onUpdate: () => {
+        const d = Math.max(0.001, Math.min(0.999, state.p)) * length;
+        const a = geo.getPointAtLength(d);
+        const b = geo.getPointAtLength(Math.min(length, d + 1));
+        const angle = (Math.atan2(b.y - a.y, b.x - a.x) * 180) / Math.PI;
+        plane.setAttribute("transform", `translate(${a.x} ${a.y}) rotate(${angle})`);
+        line.style.strokeDashoffset = String(1 - state.p);
+      },
+    },
   );
 }

@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
-import type { Project } from "@/content/site";
+import type { Project } from "@/data";
 import { lockScroll } from "@/lib/scroll";
 import { pad } from "@/lib/utils";
 

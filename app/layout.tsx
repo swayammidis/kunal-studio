@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import Script from "next/script";
 import { Instrument_Serif, Inter_Tight, Mrs_Saint_Delafield } from "next/font/google";
-import { brand, faqs, hero } from "@/content/site";
+import { brand, faqs, hero } from "@/data";
 import "./globals.css";
 
 const display = Instrument_Serif({

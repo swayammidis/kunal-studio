@@ -2,8 +2,8 @@
 
 import dynamic from "next/dynamic";
 import { useEffect, useRef, useState } from "react";
-import { projects } from "@/content/site";
-import { GALLERY_EVENT, type GalleryRequest } from "@/lib/gallery";
+import { projects } from "@/data";
+import { GALLERY_EVENT, type GalleryRequest } from "@/components/gallery/events";
 import { track } from "@/lib/analytics";
 
 // The lightbox is only downloaded the first time someone opens a story.

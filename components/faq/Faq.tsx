@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { faqIntro, faqs } from "@/content/site";
+import { faqIntro, faqs } from "@/data";
 import { SectionMark } from "@/components/ui/SectionMark";
 import { cx, pad } from "@/lib/utils";
 
@@ -9,11 +9,11 @@ export function Faq() {
   const [open, setOpen] = useState<number | null>(0);
 
   return (
-    <section id="faq" aria-labelledby="faq-title" className="theme-light relative section-pad">
+    <section id="faq" aria-labelledby="faq-title" className="theme-light relative section-pad" data-curtain>
       <div className="wrap grid gap-y-12 lg:grid-cols-12 lg:gap-x-10">
         <div className="lg:col-span-4">
           <div className="lg:sticky lg:top-[calc(var(--header-h)+6vh)]">
-            <SectionMark number="07" label="Frequently Asked Questions" />
+            <SectionMark number="08" label="Frequently Asked Questions" />
             <h2 id="faq-title" className="t-h2 mt-8" data-reveal="lines">
               <span className="ln">
                 <span style={{ ["--i" as string]: 0 }}>Your questions,</span>

@@ -1,5 +1,5 @@
 import Image from "next/image";
-import type { Photo as PhotoData } from "@/content/site";
+import type { Photo as PhotoData } from "@/data";
 import { cx } from "@/lib/utils";
 
 type Props = {

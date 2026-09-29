@@ -1,8 +1,8 @@
 "use client";
 
-import { useId, useRef, useState } from "react";
-import { brand, contact } from "@/content/site";
-import { track } from "@/lib/analytics";
+import { useEffect, useId, useRef, useState } from "react";
+import { brand } from "@/data";
+import { getAttribution, track } from "@/lib/analytics";
 import { cx } from "@/lib/utils";
 
 type Status = "idle" | "sending" | "sent" | "error";
@@ -59,7 +59,7 @@ export function ContactForm() {
       const res = await fetch("/api/inquiry", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
+        body: JSON.stringify({ ...data, attribution: getAttribution() }),
       });
       const json = (await res.json().catch(() => ({}))) as { ok?: boolean };
       if (!res.ok || !json.ok) throw new Error("not-delivered");
@@ -72,15 +72,7 @@ export function ContactForm() {
     }
   };
 
-  if (status === "sent") {
-    return (
-      <div className="border border-[var(--line-dark)] p-8 sm:p-12" role="status">
-        <p className="t-label text-champ">Inquiry received</p>
-        <p className="t-h3 mt-5">{contact.success}</p>
-        <p className="t-body mt-4 text-ivory/70">{contact.intro[1]}</p>
-      </div>
-    );
-  }
+  if (status === "sent") return <InquiryReceived />;
 
   const field = (name: keyof Errors) => ({
     "aria-invalid": errors[name] ? true : undefined,
@@ -198,5 +190,46 @@ export function ContactForm() {
         ) : null}
       </div>
     </form>
+  );
+}
+
+/** Success state — the last frame of the story rather than a system message. */
+function InquiryReceived() {
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    ref.current?.focus();
+  }, []);
+  return (
+    <div ref={ref} tabIndex={-1} role="status" className="relative border border-[var(--line-dark)] p-7 outline-none sm:p-12">
+      <span className="frame-marks m-3 text-champ/60" aria-hidden>
+        <i />
+      </span>
+      <p className="t-label flex items-center gap-4 text-champ">
+        <span>01 / Inquiry received</span>
+        <span className="h-px w-10 bg-current opacity-60" aria-hidden />
+      </p>
+      <p className="t-h2 mt-8 text-[clamp(2.3rem,1rem+4.2vw,4.6rem)]">
+        Thank you
+        <br />
+        for trusting us
+        <br />
+        with your <em className="serif-em">story.</em>
+      </p>
+      <p className="t-body mt-6 text-ivory/70">We&apos;ll be in touch soon.</p>
+      <div className="mt-10 flex flex-col gap-3 sm:flex-row">
+        <a href="#stories" className="btn btn-solid" data-cursor="View work →" data-magnetic>
+          <span>Back to Stories</span>
+          <span className="arrow" aria-hidden>
+            →
+          </span>
+        </a>
+        <a href="#films" className="btn btn-ghost-dark" data-cursor="Play film →" data-magnetic>
+          <span>Watch Our Films</span>
+          <span className="arrow" aria-hidden>
+            →
+          </span>
+        </a>
+      </div>
+    </div>
   );
 }

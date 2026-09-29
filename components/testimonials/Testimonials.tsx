@@ -2,10 +2,10 @@
 
 import Image from "next/image";
 import { useRef, useState } from "react";
-import { testimonials, type Testimonial } from "@/content/site";
+import { testimonials, type Testimonial } from "@/data";
 import { SectionMark } from "@/components/ui/SectionMark";
 import { CtaLink } from "@/components/ui/CtaLink";
-import { openGallery } from "@/lib/gallery";
+import { openGallery } from "@/components/gallery/events";
 import { cx, excerpt, pad } from "@/lib/utils";
 
 const total = testimonials.length;
@@ -50,7 +50,7 @@ export function Testimonials() {
       <div className="wrap">
         <div className="flex flex-col justify-between gap-10 lg:flex-row lg:items-end">
           <div>
-            <SectionMark number="06" label="Testimonials" />
+            <SectionMark number="07" label="Testimonials" />
             <h2 id="testimonials-title" className="t-h2 mt-8" data-reveal="lines">
               <span className="ln">
                 <span style={{ ["--i" as string]: 0 }}>Real emotions.</span>
@@ -174,7 +174,7 @@ function Card({ t, expanded, onToggle, onFocus }: { t: Testimonial; expanded: bo
               </button>
             ) : null}
             {t.slug ? (
-              <button type="button" onClick={() => openGallery(t.slug!)} className="link-line t-label text-champ" data-cursor="View story →">
+              <button type="button" onClick={() => openGallery(t.slug!)} className="link-line t-label text-champ" data-cursor="Open gallery →">
                 View the gallery <span aria-hidden>→</span>
               </button>
             ) : null}

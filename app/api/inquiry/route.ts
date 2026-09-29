@@ -20,6 +20,16 @@ type Inquiry = {
 
 const clean = (v: unknown, max: number) => (typeof v === "string" ? v.trim().slice(0, max) : "");
 
+/** Campaign attribution (utm_*, gclid, …) captured on landing — flat string map only. */
+function cleanAttribution(v: unknown): Record<string, string> {
+  if (!v || typeof v !== "object") return {};
+  const out: Record<string, string> = {};
+  for (const [k, val] of Object.entries(v as Record<string, unknown>).slice(0, 30)) {
+    if (/^[a-z_]{1,40}$/.test(k) && typeof val === "string") out[k] = val.slice(0, 300);
+  }
+  return out;
+}
+
 export async function POST(request: Request) {
   let body: Record<string, unknown>;
   try {
@@ -57,6 +67,7 @@ export async function POST(request: Request) {
       headers: { "Content-Type": "application/json", Accept: "application/json" },
       body: JSON.stringify({
         ...inquiry,
+        attribution: cleanAttribution(body.attribution),
         source: "studiokunalphotography.com landing page",
         submittedAt: new Date().toISOString(),
       }),

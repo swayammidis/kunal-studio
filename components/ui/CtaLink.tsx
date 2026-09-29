@@ -17,7 +17,7 @@ type Props = {
  * for smooth scrolling; clicks are tracked through data attributes so this
  * stays a Server Component.
  */
-export function CtaLink({ href, children, variant = "ghost-dark", track, trackLabel, cursor = "Connect →", className, external }: Props) {
+export function CtaLink({ href, children, variant = "ghost-dark", track, trackLabel, cursor = "Let’s connect →", className, external }: Props) {
   return (
     <a
       href={href}
